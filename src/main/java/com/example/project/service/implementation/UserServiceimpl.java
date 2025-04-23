@@ -1,15 +1,20 @@
 package com.example.project.service.implementation;
 
-import com.amazonaws.services.kms.model.NotFoundException;
+
+import com.example.project.exception.NotFoundException;
+//import com.amazonaws.services.kms.model.NotFoundException;
 import com.example.project.Mapper.EntityDtoMapper;
 import com.example.project.dto.LoginRequest;
 import com.example.project.dto.Response;
 import com.example.project.dto.UserDto;
 import com.example.project.entity.User;
 import com.example.project.enums.UserRole;
+import com.example.project.exception.InvalidCredentialsException;
 import com.example.project.repository.UserRepo;
 import com.example.project.security.JwtUtils;
 
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import lombok.RequiredArgsConstructor;
 
 import org.springframework.security.core.Authentication;
@@ -19,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -31,12 +37,25 @@ public class UserServiceimpl {
     private final PasswordEncoder passwordEncoder;
     private final EntityDtoMapper entityDtoMapper;
     private final JwtUtils jwtUtils;
-
+    private final Validator validator;
 
 
 
     public Response registerUser(UserDto registrationRequest) {
         UserRole role = UserRole.USER;
+
+        String email = registrationRequest.getEmail().trim();
+        String password = registrationRequest.getPassword();
+
+        // ✅ Check for spaces in email and password
+        if (email.matches(".*\\s+.*")) {
+            throw new InvalidCredentialsException("Email must not contain spaces");
+        }
+
+        if (password.matches(".*\\s+.*")) {
+            throw new InvalidCredentialsException("Password must not contain spaces");
+        }
+
 
         if(registrationRequest.getRole()!=null && registrationRequest.getRole().equalsIgnoreCase("admin")){
             role = UserRole.ADMIN;
@@ -45,6 +64,13 @@ public class UserServiceimpl {
         User user = User.builder().name(registrationRequest.getName()).email(registrationRequest.getEmail())
                 .password(passwordEncoder.encode(registrationRequest.getPassword())).phoneNumber(registrationRequest.getPhoneNumber())
                 .role(role).build();
+
+
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            String message = violations.iterator().next().getMessage(); // get first error message
+            throw new InvalidCredentialsException(message); // Or create a new exception like InvalidInputException
+        }
 
         User savedUser = userRepo.save(user);
 
@@ -56,7 +82,7 @@ public class UserServiceimpl {
     public Response loginUser(LoginRequest loginRequest) {
         User user = userRepo.findByEmail(loginRequest.getEmail()).orElseThrow(()->new NotFoundException("Email Not Found"));
         if(!passwordEncoder.matches(loginRequest.getPassword(), user.getPassword())){
-            throw new NotFoundException("not matched");
+            throw new InvalidCredentialsException("Invalid Email Or Password");
         }
         String token = jwtUtils.generateToken(user);
         UserDto userDto = entityDtoMapper.mapUserToDto(user);

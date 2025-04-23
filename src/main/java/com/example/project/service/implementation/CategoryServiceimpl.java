@@ -8,6 +8,7 @@ import com.example.project.exception.NotFoundException;
 import com.example.project.repository.CategoryRepo;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,7 +23,8 @@ public class CategoryServiceimpl  {
 
 
         private final CategoryRepo categoryRepo;
-        private final EntityDtoMapper entityDtoMapper;
+       private final EntityDtoMapper entityDtoMapper;
+
 
 
 
@@ -48,6 +50,8 @@ public class CategoryServiceimpl  {
 
             return Response.builder().categoryList(categoryDtoList).build();
         }
+
+
 
 
         public Response getCategoryById(Long categoryId) {

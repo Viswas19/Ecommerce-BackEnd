@@ -25,6 +25,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidCredentialsException.class)
     public ResponseEntity<Response> handleInvalidCredentialsException(InvalidCredentialsException ex,WebRequest request){
         Response errorResponse = Response.builder().message(ex.getMessage()).build();
-        return new ResponseEntity<>(errorResponse,HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponse,HttpStatus.UNAUTHORIZED);
     }
 }

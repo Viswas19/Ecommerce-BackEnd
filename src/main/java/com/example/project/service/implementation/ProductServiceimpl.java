@@ -1,11 +1,11 @@
 package com.example.project.service.implementation;
 
-import com.amazonaws.services.kms.model.NotFoundException;
 import com.example.project.Mapper.EntityDtoMapper;
 import com.example.project.dto.ProductDto;
 import com.example.project.dto.Response;
 import com.example.project.entity.Category;
 import com.example.project.entity.Product;
+import com.example.project.exception.NotFoundException;
 import com.example.project.repository.CategoryRepo;
 import com.example.project.repository.ProductRepo;
 import com.example.project.service.AwsS3Service;
@@ -13,6 +13,7 @@ import com.example.project.service.AwsS3Service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -108,6 +109,6 @@ public class ProductServiceimpl  {
         }
         List<ProductDto> productDtoList = products.stream().map(entityDtoMapper::mapProductToDtoBasic).collect(Collectors.toList());
 
-        return Response.builder().productList(productDtoList).build();
+        return Response.builder().productList(productDtoList).message(productDtoList.isEmpty() ? "No Products Found" : "Success").build();
     }
 }

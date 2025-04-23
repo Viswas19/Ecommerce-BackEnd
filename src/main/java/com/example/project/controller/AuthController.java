@@ -7,6 +7,7 @@ import com.example.project.dto.UserDto;
 
 import com.example.project.service.implementation.UserServiceimpl;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +18,11 @@ import org.springframework.web.bind.annotation.*;
 public class AuthController {
     private final UserServiceimpl userServiceimpl;
     @PostMapping("/register")
-    public ResponseEntity<Response>registerUser(@RequestBody UserDto registrationRequest){
+    public ResponseEntity<Response>registerUser(@Valid @RequestBody UserDto registrationRequest){
         return ResponseEntity.ok(userServiceimpl.registerUser(registrationRequest));
     }
 
-    @PutMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<Response>loginUser(@RequestBody LoginRequest loginRequest){
         return ResponseEntity.ok(userServiceimpl.loginUser(loginRequest));
     }

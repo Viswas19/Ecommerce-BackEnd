@@ -20,7 +20,7 @@ public class ProductController {
     private final ProductServiceimpl productServiceimpl;
 
 
-    @PostMapping("")
+    @PostMapping
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> createProduct(@RequestParam Long categoryId, @RequestParam MultipartFile image, @RequestParam String name, @RequestParam String description, @RequestParam BigDecimal price){
         if (categoryId == null || image.isEmpty() || name.isEmpty() || description.isEmpty() || price == null){
@@ -30,7 +30,7 @@ public class ProductController {
     }
 
 
-    @PutMapping("")
+    @PutMapping("/{productId}")
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<Response> updateProduct(@RequestParam Long productId, @RequestParam(required = false) Long categoryId, @RequestParam(required = false) MultipartFile image, @RequestParam(required = false)  String name, @RequestParam(required = false)  String description, @RequestParam(required = false) BigDecimal price){
         return ResponseEntity.ok(productServiceimpl.updateProduct(productId, categoryId, image, name, description, price));
@@ -49,7 +49,7 @@ public class ProductController {
         return ResponseEntity.ok(productServiceimpl.getProductById(productId));
     }
 
-    @GetMapping("")
+    @GetMapping
     public ResponseEntity<Response> getAllProducts(){
         return ResponseEntity.ok(productServiceimpl.getAllProducts());
     }

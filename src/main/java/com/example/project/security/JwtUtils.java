@@ -17,7 +17,7 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Service
-@Slf4j
+//@Slf4j
 public class JwtUtils {
 
     private static final long EXPIRATION_TIME_IN_MILLISEC = 1000L*60L*60L*24L*30L*6L;
